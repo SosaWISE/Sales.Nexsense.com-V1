@@ -1,0 +1,13 @@
+<div class="contact-infobox">
+	<div class='contact-infobox-name' ng-show="SalesContact.selectedContact.firstName || SalesContact.selectedContact.lastName">
+		{{SalesContact.selectedContact.firstName}} {{SalesContact.selectedContact.lastName}}
+	</div>
+
+	<div ng-show="SalesContact.selectedContact.fullAddress">{{SalesContact.selectedContact.fullAddress}}</div>
+
+	<div ng-show="SalesContact.selectedContact.categoryId && SalesContact.selectedContact.categoryId != 0">{{getCategoryById(SalesContact.selectedContact.categoryId).name}}</div>
+
+	<div ng-show="SalesContact.selectedContact.currentSystemId && SalesContact.selectedContact.currentSystemId != 0">{{getSystemById(SalesContact.selectedContact.currentSystemId).companyName}}</div>
+
+	<div class="contact-infobox-edit link standalone" ng-click="SalesContact.editSelectedContact(this);">[edit]</div>
+</div>

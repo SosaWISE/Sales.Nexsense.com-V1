@@ -1,0 +1,3 @@
+<?php
+	//close_mysqli();
+?>

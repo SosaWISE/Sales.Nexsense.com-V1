@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui" />
+
+        <script language="javascript" type="text/javascript" src="view/js/BarGraph.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/angular/angular.min.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/common-2.0.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/global_vars.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/standard.js"></script>
+        <link rel="stylesheet" type="text/css" href="view/css/standard.css" />
+
+        <!-- Editable head -->
+
+        <title>Sign in</title>
+        <meta name="description" content="" />
+        <script language="javascript" type="text/javascript" src="view/js/signin.js"></script>
+        <link rel="stylesheet" type="text/css" href="view/css/signin.css" />
+
+        <!-- END Editable head -->
+
+    </head>
+    <body ng-app="MySite">
+        <div id="wrapper" ng-controller="SignInPage">
+            <!-- Body -->
+
+
+
+            <div class="signin-container" ng-show="!$site.isSignedIn">
+	            <h1>Sign in</h1>
+	            <div class="signin-form">
+		            <form name="signinForm">
+		            	<label>Email address</label>
+		            	<input type="text" ng-model="$site.user.username">
+
+		            	<label>Password</label>
+		            	<input type="password" ng-model="$site.user.password">
+
+		            	<div class="button-container right">
+		            		<button ng-click="attemptSignIn()" ng-hide="$site.isSigningIn">Sign in</button>
+                            <div id="signin-wait" ng-show="$site.isSigningIn"></div>
+		            	</div>
+		            </form>
+	        	</div>
+	        </div>
+
+
+            <div class="signin-container" ng-show="$site.isSignedIn && newPasswordFormIsDisplayed">
+                <h1>Create a password</h1>
+                Since this is your first time using the Nexsense Sales app, you'll need to create a new
+                password for future access.
+                <div class="signin-form">
+                    <form name="newPasswordForm">
+                        <label>New password</label>
+                        <input type="password" ng-model="newPassword1">
+
+                        <label>Confirm new password</label>
+                        <input type="password" ng-model="newPassword2">
+
+                        <div class="button-container">
+                            <button ng-click="saveNewPassword()">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+            <div class="signin-container" ng-show="$site.isSignedIn && createPINFormIsDisplayed">
+                <div ng-show="!newPIN1">
+                    <h1>Create a PIN</h1>
+                    To make mobile access easier, you'll need to create a 4-digit PIN which will allow you to unlock the app if you've already signed in once.
+                </div>
+                <div ng-show="newPIN1">
+                    <h1>Confirm your PIN</h1>
+                    Input your new PIN again to make sure we've got it right.
+                </div>
+                <div class="signin-form">
+
+                    <div>
+                        <input type="password" ng-model="pin">
+                    </div>
+                    <div class="number-pad">
+                        <div>
+                            <button class="PIN" ng-click="press(7)">7</button>
+                            <button class="PIN" ng-click="press(8)">8</button>
+                            <button class="PIN" ng-click="press(9)">9</button>
+                        </div>
+                        <div>
+                            <button class="PIN" ng-click="press(4)">4</button>
+                            <button class="PIN" ng-click="press(5)">5</button>
+                            <button class="PIN" ng-click="press(6)">6</button>
+                        </div>
+                        <div>
+                            <button class="PIN" ng-click="press(1)">1</button>
+                            <button class="PIN" ng-click="press(2)">2</button>
+                            <button class="PIN" ng-click="press(3)">3</button>
+                        </div>
+                        <div>
+                            <button class="PIN" ng-click="press(0)">0</button>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+		</div>
+	</body>
+</html>

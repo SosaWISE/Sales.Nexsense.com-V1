@@ -1,0 +1,53 @@
+
+
+	<div class="signin-shadow"></div>
+
+    <div class="signin-container">
+        <h1>Sign in</h1>
+        <div class="signin-form">
+            <form name="signinForm" ng-show="!$site.user.userid">
+            	<label>Email address</label>
+            	<input type="text" ng-model="$site.user.username">
+
+            	<label>Password</label>
+            	<input type="password" ng-model="$site.user.password">
+
+            	<div class="button-container right">
+            		<button ng-click="$site.signInDialogOnClick()">Sign in</button>
+            	</div>
+            </form>
+
+
+            <div class="signin-container" ng-show="$site.user.userid">
+                <h1>Sign in</h1>
+                <div class="sign-in-profile" ng-show="$site.user.userid">
+                    <!--<img ng-src="{{$site.user.photoUrl}}" />-->
+                    Signed in as {{$site.user.firstName}} {{$site.user.lastName}}. <span class="link" ng-click="$site.signOut()">Sign in as someone else</span>
+                </div>
+                <div class="signin-form">
+                    <div>{{pin}}</div>
+                    <div class="number-pad">
+                        <div>
+                            <button class="PIN" ng-click="press(7)">7</button>
+                            <button class="PIN" ng-click="press(8)">8</button>
+                            <button class="PIN" ng-click="press(9)">9</button>
+                        </div>
+                        <div>
+                            <button class="PIN" ng-click="press(4)">4</button>
+                            <button class="PIN" ng-click="press(5)">5</button>
+                            <button class="PIN" ng-click="press(6)">6</button>
+                        </div>
+                        <div>
+                            <button class="PIN" ng-click="press(1)">1</button>
+                            <button class="PIN" ng-click="press(2)">2</button>
+                            <button class="PIN" ng-click="press(3)">3</button>
+                        </div>
+                        <div>
+                            <button class="PIN" ng-click="press(0)">0</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    	</div>
+    </div>

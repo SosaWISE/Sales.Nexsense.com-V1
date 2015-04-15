@@ -1,0 +1,74 @@
+body {
+	padding: 30px;
+}
+
+
+
+
+
+div.report-data {
+	margin: 30px 0;
+}
+
+div.filters {
+	border: 1px solid #f0f0f0;
+	border-radius: 20px;
+	padding: 20px;
+	display: inline-block;
+}
+
+td.groupHeading {
+	font-weight: 400;
+	background-color: rgba(112,113,112,0.1);
+	border-bottom: 1px solid #ccc;
+	cursor: pointer;
+}
+td.groupie:first-child {
+	padding-left: 20px;
+}
+tbody > tr:nth-child(odd) > td.groupie {
+	background-color: rgba(112,113,112,0.05);
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th, thead > tr > td {
+	background-color: rgba(98,37,157,0.8);
+	color: #fff;
+	font-size: 14px;
+	font-weight: 400;
+
+	padding: 5px 10px;
+	text-align: left;
+
+	border-right: 1px solid #fff;
+}
+table > thead > tr > th:last-child, thead > tr > td:last-child {
+	border-right: none;
+}
+table > thead > tr > th.number, table > thead > tr > th.date, thead > tr > td.number, thead > tr > td.date {
+	text-align: right;
+}
+
+table > tfoot > tr > td {
+	color: #707170;
+	font-size: 13px;
+	font-weight: 300;
+}
+
+td {
+	color: #707170;
+	font-size: 13px;
+	font-weight: 300;
+	border-top: 1px solid #f0f0f0;
+
+	padding: 5px 10px;
+	text-align: left;
+}
+td.number, td.date {
+	text-align: right;
+}
+
+

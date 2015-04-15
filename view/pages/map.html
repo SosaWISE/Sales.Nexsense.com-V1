@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui" />
+
+        <script language="javascript" type="text/javascript" src="view/js/BarGraph.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/angular/angular.min.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/common-2.0.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/global_vars.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/standard.js"></script>
+        <link rel="stylesheet" type="text/css" href="view/css/standard.css" />
+
+        <!-- Editable head -->
+
+        <title>Sales map</title>
+        <meta name="description" content="" />
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCITeswJw6LmEelMuW6OVAniLTG-K_3NcU"></script>
+        <script language="javascript" type="text/javascript" src="view/js/map/SalesContactService.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/map/SalesAreaService.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/map/SalesContactTimelineService.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/map/map-vars.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/map/map.js"></script>
+        <link rel="stylesheet" type="text/css" href="view/css/map.css" />
+
+        <!-- END Editable head -->
+
+    </head>
+    <body ng-app="MySite">
+        <div id="wrapper" ng-controller="MapPage">
+            <header></header>
+            <!-- Body -->
+
+            <div id="loading-screen" ng-show="isLoading"><div id="loading-logo"></div></div>
+
+			<div id="map-canvas"></div>
+
+			<div id="settings-button" ng-click="displaySettings()"></div>
+			<div id="tools-button" ng-click="displayTools()" ng-show="$site.hasPermission(['OFFICE_STATS','COMPANY_STATS'])"></div>
+
+
+			<!-- Settings/Filters panel -->
+			<div id="settings-panel" ng-class="{open:settingsAreDisplayed,close:!settingsAreDisplayed}">
+				<div class="panel-close" ng-click="hideSettings()"></div>
+
+				<!-- Filter contacts already on the map -->
+				<div id="map-filters">
+					<h2>Filters</h2>
+					<div>
+						Show contacts made in <select ng-model="officeId" ng-options="o.id as (o.id == 0 ? o.officeCity : (o.officeCity + ', ' + o.officeState)) for o in offices" ng-change="SalesContact.filterVisibleContacts(this)"></select>
+						<span ng-show="officeId"> by <select ng-model="salesRepId" ng-options="r.id as (r.firstName + ' ' + r.lastName) for r in salesReps | salesRepFilterByOffice:officeId" ng-change="SalesContact.filterVisibleContacts(this)"></select></span>
+					</div>
+					<div class="categories-filter">
+						<h3>
+							Categories
+							<div class="pill left lighter" ng-click="selectAllCategories()">Select all</div><div class="pill right" ng-click="selectNoneCategories()">none</div>
+							<div class="pill float-right" ng-click="displayEditCategoriesDialog()">Edit</div>
+						</h3>
+						<div class="filter-container">
+							<div class="columns">
+								<div ng-repeat="c in categories">
+									<input type="checkbox" ng-model="c.visible" ng-change="SalesContact.filterVisibleContacts(this)" id="ct{{$index}}"/><label for="ct{{$index}}"><div></div>{{c.name}}</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="current-systems-filter">
+						<h3>
+							Current Systems
+							<div class="pill left lighter" ng-click="selectAllSystemTypes()">Select all</div><div class="pill right" ng-click="selectNoneSystemTypes()">none</div>
+						</h3>
+						<div class="filter-container">
+							<div class="columns">
+								<div ng-repeat="s in systemTypes">
+									<input type="checkbox" ng-model="s.visible" ng-change="SalesContact.filterVisibleContacts(this)" id="st{{$index}}"/><label for="st{{$index}}"><div></div>{{s.companyName}}</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="iconmode-filter">
+						<h3>Map icons</h3>
+						<div class="filter-container">
+							<div><input type="radio" ng-model="iconmode" name="iconmode" value="category" id="iconmode-ct"><label for="iconmode-ct"><div></div>Use category icons on map</label></div>
+							<div><input type="radio" ng-model="iconmode" name="iconmode" value="system" id="iconmode-st"><label for="iconmode-st"><div></div>Use system logos on map</label></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="tools-panel" ng-class="{open:toolsAreDisplayed,close:!toolsAreDisplayed}" ng-show="$site.hasPermission(['OFFICE_STATS','COMPANY_STATS'])">
+				<div class="panel-close" ng-click="hideTools()"></div>
+
+				<!-- Manager tools -->
+				<div id="option-icons">
+					<h2>Tools</h2>
+					<div class="inline-icon" ng-click="setMapMode('areas')">
+						<div class="icon" id="edit-areas-icon"></div>
+						<div class="label">View/edit sales areas</div>
+					</div>
+					<div class="inline-icon" ng-click="displayContactTimeline()">
+						<div class="icon" id="contact-timeline-icon"></div>
+						<div class="label">View contacts on timeline</div>
+					</div>
+				</div>
+
+			</div>
+
+
+
+			<!-- Timeline view -->
+			<div id="contact-timeline-panel" ng-class="{open:timelineIsDisplayed,close:!timelineIsDisplayed}">
+				<div class="panel-close" ng-click="hideContactTimeline()"></div>
+
+				<h2>Contacting Timeline</h2>
+				<div>
+					From
+					<input type="date" ng-model="ContactTimeline.startTimestamp">
+					to
+					<input type="date" ng-model="ContactTimeline.endTimestamp">
+					<button ng-click="ContactTimeline.refreshTimeline(this)" class="small">Go</button>
+				</div>
+
+				<!-- Filters -->
+				<div id="contact-timeline-filter-summary">
+					<div ng-click="ContactTimeline.displayFilters(this)">Filters</div>
+					<div ng-click="ContactTimeline.displayFilters(this)">{{ContactTimeline.getFiltersAsString(this)}}</div>
+
+					<div id="contact-timeline-filters-popup" ng-show="ContactTimeline.timelineFiltersAreDisplayed">
+						<h2>Filters</h2>
+						<div>
+							Show contacts made in <select ng-model="officeId" ng-options="o.id as (o.id == 0 ? o.officeCity : (o.officeCity + ', ' + o.officeState)) for o in offices"></select>
+							<span ng-show="officeId"> by <select ng-model="salesRepId" ng-options="r.id as (r.firstName + ' ' + r.lastName) for r in salesReps | salesRepFilterByOffice:officeId"></select></span>
+						</div>
+						<div class="categories-filter">
+							<h3>
+								Categories
+								<div class="select-all" ng-click="selectAllCategories()">Select all</div><div class="select-none" ng-click="selectNoneCategories()">none</div>
+							</h3>
+							<div class="filter-container">
+								<div class="columns">
+									<div ng-repeat="c in categories">
+										<input type="checkbox" ng-model="c.visible" id="ct{{$index}}_2"/><label for="ct{{$index}}_2"><div></div>{{c.name}}</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="current-systems-filter">
+							<h3>
+								Current Systems
+								<div class="select-all" ng-click="selectAllSystemTypes()">Select all</div><div class="select-none" ng-click="selectNoneSystemTypes()">none</div>
+							</h3>
+							<div class="filter-container">
+								<div class="columns">
+									<div ng-repeat="s in systemTypes">
+										<input type="checkbox" ng-model="s.visible" id="st{{$index}}_2"/><label for="st{{$index}}_2"><div></div>{{s.companyName}}</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="button-container">
+							<button ng-click="ContactTimeline.applyFilters(this)">Done</button>
+						</div>
+
+					</div>
+				</div>
+
+
+				<!-- Graph -->
+				<div id="contact-timeline-container" graph-id="'contact-timeline'" graph-data="[]" graph-options="ContactTimeline.options" bar-graph></div>
+			</div>
+
+
+
+
+
+			<!-- Edit areas main menu -->
+			<div id="edit-areas-select-panel" ng-class="{open:(mapMode=='areas' && SalesArea.mode=='select'),close:!(mapMode=='areas' && SalesArea.mode=='select')}">
+				<button ng-click="SalesArea.setSalesAreaMode(this, 'new')">New area</button>
+				<button ng-click="SalesArea.saveSalesAreas(this)">Save</button>
+				<button ng-click="SalesArea.cancelSalesAreaMode(this)" class="cancel">Exit edit mode</button>
+			</div>
+
+			<!-- Create/edit area panel -->
+			<div id="edit-areas-new-panel" ng-class="{open:(mapMode=='areas'&&(SalesArea.mode=='new' || SalesArea.mode=='edit')),close:!(mapMode=='areas'&&(SalesArea.mode=='new' || SalesArea.mode=='edit'))}">
+				<form name="newSalesAreaForm">
+					<!--<div class="form-element"><label>Name of area:</label><input type="text" name="areaName" ng-model="SalesArea.currentArea.areaName" /></div>-->
+					<div class="form-element"><label>Office:</label><select name="officeId" ng-model="SalesArea.currentArea.officeId" ng-options="o.id as (o.officeCity + ', ' + o.officeState) for o in offices"></select></div>
+					<div class="form-element" ng-show="SalesArea.currentArea && SalesArea.currentArea.officeId"><label>Assigned to:</label><select name="salesRepId" ng-model="SalesArea.currentArea.salesRepId" ng-options="r.id as (r.firstName + ' ' + r.lastName) for r in salesReps | filter:{officeId:(SalesArea.currentArea && SalesArea.currentArea.officeId)}"></select></div>
+					<div class="form-element"><label>Start assignment on:</label><input type="datetime-local" name="startTimestamp" ng-model="SalesArea.currentArea.startTimestamp"></div>
+					<div class="footer-button-group">
+						<button ng-click="SalesArea.saveCurrentSalesArea(this)">Save</button>
+						<button ng-click="SalesArea.cancelCurrentSalesArea(this)" class="cancel">Cancel</button>
+						<button ng-click="SalesArea.deleteCurrentSalesArea(this)" class="secondary">Delete</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Create/edit contact panel -->
+			<div id="new-contact" ng-class="{open:SalesContact.newContactFormIsDisplayed,close:!SalesContact.newContactFormIsDisplayed}">
+				<h2>Homeowner notes</h2>
+				<form name="contactForm">
+
+					<div class="field">
+						<input type="text" name="firstName" ng-model="SalesContact.newContact.firstName" placeholder="First name">
+					</div>
+
+					<div class="field">
+						<input type="text" name="lastName" ng-model="SalesContact.newContact.lastName" placeholder="Last name">
+					</div>
+					<div class="field">
+						<input type="text" name="fullAddress" ng-model="SalesContact.newContact.fullAddress" placeholder="Address" required>
+					</div>
+
+					<div class="field">
+						<label>Category</label>
+						<select name="category" ng-model="SalesContact.newContact.categoryId" ng-change="categoryChanged()" required>
+							<option ng-repeat="c in categories" value="{{c.id}}" ng-selected="c.id==0">{{c.name}}</option>
+							<option value="new">Create a new category...</option>
+						</select>
+						<div class="fine-print right link inverted" ng-click="displayEditCategoriesDialog()">Edit categories</div>
+					</div>
+
+					<div class="field">
+						<label>Current system</label>
+						<select name="currentSystem" ng-model="SalesContact.newContact.currentSystemId" ng-change="currentSystemChanged()" ng-options="s.id as s.companyName for s in systemTypes"></select>
+					</div>
+
+					<div class="field">
+						<label>Notes</label>
+						<textarea name="notes" ng-model="SalesContact.newContact.notes"></textarea>
+					</div>
+
+					<div class="field">
+						<label>Follow up</label>
+						<input type="datetime-local" ng-model="SalesContact.newContact.followup" name="followup">
+					</div>
+
+					<div class="button-container">
+						<button ng-click="SalesContact.saveNewContact(this)">Save</button>
+						<button class="cancel" ng-click="SalesContact.cancelNewContact(this)">Cancel</button>
+					</div>
+
+				</form>
+			</div>
+
+
+			<!-- Modal dialog boxes -->
+			<div class="modal-shadow" ng-show="isDialogDisplayed()"></div>
+
+			<!-- New category dialog box -->
+			<div id="new-category-dialog" class="modal-container" ng-show="isDialogDisplayed('newCategoryDialog')">
+				<div class="panel-close" ng-click="hideNewCategoryDialog()"></div>
+
+				<div class="modal-content">
+					<h2>New Category</h2>
+					<div>
+						<input type="text" id="newCategoryName" ng-model="SalesContact.newCategory.name">
+					</div>
+
+					<div id="icon-container">
+						<div>Choose an icon for this new category</div>
+						<div ng-repeat="ico in categoryIcons" class="categoryIcon" ng-class="{selected:ico==SalesContact.newCategory.filename}" ng-click="SalesContact.selectNewCategory(ico)">
+							<div class="img" ng-style="{'background-image':'url('+getCategoryIconPath(ico)+')'}"></div>
+						</div>
+					</div>
+
+					<div class="button-container">
+						<button ng-click="SalesContact.saveCategory(this)">Save</button>
+						<button class="cancel" ng-click="hideNewCategoryDialog()">Cancel</button>
+						<button class="secondary" ng-show="SalesContact.newContacType.id">Delete</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Edit categories dialog box -->
+			<div id="edit-categories-dialog" class="modal-container" ng-show="isDialogDisplayed('editCategoriesDialog')">
+				<div class="panel-close" ng-click="hideEditCategoriesDialog()"></div>
+
+				<div class="modal-content">
+					<h2>Edit Categories</h2>
+
+					<div id="category-list">
+						<div ng-repeat="ct in categories" class="category">
+							<div class="categoryIcon" ng-click="displayNewCategoryDialog(ct.id)"><div class="img" ng-style="{'background-image':'url('+getCategoryIconPath(ct.filename)+')'}"></div></div>
+							<span ng-click="displayNewCategoryDialog(ct.id)">{{ct.name}}</span>
+
+							<div class="float-right" ng-hide="categoryIdToDelete==ct.id">
+								<div class="pill subtle" ng-click="categoryIdToDelete=ct.id">Delete</div>
+							</div>
+							<div class="float-right" ng-show="categoryIdToDelete==ct.id">
+								<div class="pill left warning" ng-click="SalesContact.deleteCategory(this, ct)">Delete</div><div class="pill right" ng-click="categoryIdToDelete=null">Cancel</div>
+							</div>
+						</div>
+					</div>
+					<div class="new-category"><button class="small tertiary" ng-click="displayNewCategoryDialog()">New category</button></div>
+
+					<div class="button-container">
+						<button class="cancel" ng-click="hideEditCategoriesDialog()">Close</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</body>
+</html>

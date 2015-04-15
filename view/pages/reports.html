@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui" />
+
+        <script language="javascript" type="text/javascript" src="view/js/BarGraph.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/angular/angular.min.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/common-2.0.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/global_vars.js"></script>
+        <script language="javascript" type="text/javascript" src="view/js/standard.js"></script>
+        <link rel="stylesheet" type="text/css" href="view/css/standard.css" />
+
+        <!-- Editable head -->
+
+        <title>Sales reports</title>
+        <meta name="description" content="" />
+        <script language="javascript" type="text/javascript" src="view/js/reports.js"></script>
+        <link rel="stylesheet" type="text/css" href="view/css/reports.css" />
+
+        <!-- END Editable head -->
+
+    </head>
+    <body ng-app="MySite">
+        <div id="wrapper" ng-controller="ReportsPage">
+            <header></header>
+            <!-- Body -->
+
+
+            <h1>Credits and installations</h1>
+
+            <div>
+                <div class="filters">
+                    <div>
+                        Show report for
+                        <!--<select ng-model="officeId">
+                            <option value="0">All offices</option>
+                            <option ng-repeat="o in offices" ng-value="{{o.TeamLocationID}}">{{o.TeamLocation}}</option>
+                        </select>
+                        from--> <input type="date" ng-model="startDate"> to <input type="date" ng-model="endDate">
+                        <div class="inline"><button ng-click="get_credits_and_installs(0, groupByOffice)">Go</button></div>
+
+                        <div class="separated"><input type="checkbox" ng-model="groupByOffice" id="groupByOffice"><label for="groupByOffice"><div></div> Group by office</label></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-data" ng-show="salesReps.length && !groupByOffice">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sales rep</th>
+                            <th>Office</th>
+                            <th class="number">Credits run</th>
+                            <th class="number">Installations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="s in salesReps">
+                            <td>{{s.SalesRepName}}</td>
+                            <td>{{s.TeamLocation}}</td>
+                            <td class="number">{{s.NumCredits}}</td>
+                            <td class="number">{{s.NumInstalls}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="report-data" ng-show="officeData.length && groupByOffice">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Office</th>
+                            <th class="number">Credits run</th>
+                            <th class="number">Installations</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="o in officeData">
+                        <tr ng-click="toggleRollup(o.TeamLocationID)">
+                            <td class="groupHeading">{{o.TeamLocation}}</td>
+                            <td class="groupHeading number">{{o.NumCredits}}</td>
+                            <td class="groupHeading number">{{o.NumInstalls}}</td>
+                        </tr>
+                        <tr ng-repeat="s in o.salesReps" ng-show="o.expanded">
+                            <td class="groupie">{{s.SalesRepName}}</td>
+                            <td class="groupie number">{{s.NumCredits}}</td>
+                            <td class="groupie number">{{s.NumInstalls}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </body>
+</html>
