@@ -1,4 +1,5 @@
 <?php
+// this is my change
 class NXS_Report {
 	/***
 	* This method gets all credits and installations for a given date range and optional office
