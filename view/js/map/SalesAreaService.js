@@ -289,9 +289,8 @@ window.app.factory("SalesAreaService", ['$http', 'Messaging', 'Site',
             self.currentArea.setAreaEditable(true);
             self.currentArea.setHighlight(true);
             break;
-          case 'select':
-            break;
           default:
+          case 'select':
             self.currentArea = null;
             $scope.map.setOptions({
               draggableCursor: null
