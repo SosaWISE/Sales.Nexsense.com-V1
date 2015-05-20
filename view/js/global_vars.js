@@ -1,2 +1,2 @@
-var SITE_PATH = '/';
-var IMG_PATH = '/view/images/';
+window.SITE_PATH = '/';
+window.IMG_PATH = '/view/images/';

@@ -1,0 +1,50 @@
+{
+  "strict": true,
+  "node": false,
+  "browser": false,
+
+  "onevar": false,
+  "laxcomma": true,
+
+  "eqeqeq": true,
+  "eqnull": true,
+  "immed": true,
+  "undef": true,
+  "unused": true,
+  "latedef": true,
+  "curly": true,
+  "trailing": true,
+
+  "smarttabs": true,
+
+  "predef": [
+    "google",
+    "angular",
+    "BarGraph",
+    "WaitIndicatorSpinner",
+    "WaitIndicators",
+
+    "Intl",
+    "require",
+    "define",
+    "console",
+
+    "StorageEvent",
+    "FileReader",
+    "HTMLInputElement",
+    "HTMLAnchorElement",
+    "HTMLDivElement",
+    "MouseEvent",
+    "ArrayBuffer",
+    "Uint8Array",
+    "Blob",
+    "FormData",
+    "atob",
+    "localStorage",
+    "navigator",
+    "location",
+    "screen",
+    "document",
+    "window"
+  ]
+}
